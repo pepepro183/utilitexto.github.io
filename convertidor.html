@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convertidor de mayúsculas y minúsculas | UtiliTexto</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #172554;
+    }
+    header {
+      background: #172554;
+      color: white;
+      text-align: center;
+      padding: 25px 15px;
+    }
+    main {
+      max-width: 760px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+    .panel {
+      background: white;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px #00000012;
+    }
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      padding: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: inherit;
+      resize: vertical;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 16px 0;
+    }
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 15px;
+      background: #1d4ed8;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover { background: #1e40af; }
+    .secondary { background: #475569; }
+    #status { color: #166534; }
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Convertidor de mayúsculas y minúsculas</h1>
+    <p>Transforma tus textos gratis con UtiliTexto</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Escribe o pega tu texto</h2>
+      <textarea id="texto" placeholder="Escribe o pega aquí tu texto..."></textarea>
+
+      <div class="buttons">
+        <button onclick="transformar('upper')">MAYÚSCULAS</button>
+        <button onclick="transformar('lower')">minúsculas</button>
+        <button onclick="transformar('title')">Primera Letra De Cada Palabra</button>
+        <button onclick="transformar('sentence')">Formato de frase</button>
+        <button class="secondary" onclick="copiar()">Copiar texto</button>
+        <button class="secondary" onclick="limpiar()">Borrar</button>
+      </div>
+
+      <p id="status" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <footer>UtiliTexto — Tus textos, más fáciles.</footer>
+
+  <script>
+    const campo = document.getElementById('texto');
+    const estado = document.getElementById('status');
+
+    function transformar(tipo) {
+      const texto = campo.value;
+
+      if (tipo === 'upper') campo.value = texto.toUpperCase();
+      if (tipo === 'lower') campo.value = texto.toLowerCase();
+      if (tipo === 'title') {
+        campo.value = texto.toLowerCase().replace(
+          /(^|[\s¿¡([{])([a-záéíóúüñ])/g,
+          (m, separador, letra) => separador + letra.toUpperCase()
+        );
+      }
+      if (tipo === 'sentence') {
+        campo.value = texto.toLowerCase().replace(
+          /(^\s*[¿¡"]*|[.!?]\s+[¿¡"]*)([a-záéíóúüñ])/g,
+          (m, separador, letra) => separador + letra.toUpperCase()
+        );
+      }
+      estado.textContent = 'Texto transformado.';
+    }
+
+    async function copiar() {
+      try {
+        await navigator.clipboard.writeText(campo.value);
+        estado.textContent = 'Texto copiado.';
+      } catch {
+        campo.select();
+        const correcto = document.execCommand('copy');
+        estado.textContent = correcto
+          ? 'Texto copiado.'
+          : 'Selecciona el texto y cópialo manualmente.';
+      }
+    }
+
+    function limpiar() {
+      campo.value = '';
+      estado.textContent = 'Texto borrado.';
+      campo.focus();
+    }
+  </script>
+</body>
+</html>
