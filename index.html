@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Cuenta palabras y caracteres gratis con UtiliTexto.">
+  <title>Contador de palabras gratis | UtiliTexto</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #172554;
+    }
+
+    header {
+      background: #172554;
+      color: white;
+      padding: 25px 16px;
+      text-align: center;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 35px auto;
+      padding: 0 16px;
+    }
+
+    .panel {
+      background: white;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px #0f172a12;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      padding: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: inherit;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      outline: 2px solid #2563eb;
+      border-color: #2563eb;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      background: #eff6ff;
+      padding: 16px 8px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .number {
+      display: block;
+      font-size: 25px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: 0;
+      padding: 12px 18px;
+      margin-top: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button:hover { background: #1d4ed8; }
+
+    .secondary {
+      background: #e2e8f0;
+      color: #172554;
+      margin-left: 6px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #475569;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .stats { grid-template-columns: 1fr; }
+      .panel { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>UtiliTexto</h1>
+    <p>Tus textos, más fáciles.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Contador de palabras online</h2>
+      <p>Escribe o pega tu texto para ver las estadísticas al instante.</p>
+
+      <label for="texto"><strong>Tu texto</strong></label>
+      <textarea id="texto"
+        placeholder="Escribe o pega aquí tu texto..."></textarea>
+
+      <div class="stats" aria-live="polite">
+        <div class="stat">
+          <span class="number" id="palabras">0</span>
+          Palabras
+        </div>
+        <div class="stat">
+          <span class="number" id="caracteres">0</span>
+          Caracteres con espacios
+        </div>
+        <div class="stat">
+          <span class="number" id="sinEspacios">0</span>
+          Caracteres sin espacios
+        </div>
+      </div>
+
+      <button id="copiar" type="button">Copiar texto</button>
+      <button id="limpiar" class="secondary" type="button">
+        Limpiar
+      </button>
+      <p id="mensaje" role="status"></p>
+    </section>
+
+    <section>
+      <h2>¿Cómo funciona?</h2>
+      <p>
+        Pega un texto en el cuadro y UtiliTexto calculará
+        automáticamente el número de palabras y caracteres.
+        Puedes utilizarlo para trabajos, redacciones y artículos.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    UtiliTexto · Herramientas de texto gratuitas
+  </footer>
+
+  <script>
+    const texto = document.getElementById("texto");
+    const palabras = document.getElementById("palabras");
+    const caracteres = document.getElementById("caracteres");
+    const sinEspacios = document.getElementById("sinEspacios");
+    const mensaje = document.getElementById("mensaje");
+
+    function actualizar() {
+      const valor = texto.value;
+      const limpio = valor.trim();
+
+      palabras.textContent = limpio
+        ? limpio.split(/\s+/u).length
+        : 0;
+
+      caracteres.textContent = valor.length;
+      sinEspacios.textContent = valor.replace(/\s/gu, "").length;
+      mensaje.textContent = "";
+    }
+
+    texto.addEventListener("input", actualizar);
+
+    document.getElementById("limpiar").addEventListener("click", () => {
+      texto.value = "";
+      actualizar();
+      texto.focus();
+    });
+
+    document.getElementById("copiar").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(texto.value);
+        mensaje.textContent = "Texto copiado.";
+      } catch {
+        mensaje.textContent =
+          "No se pudo copiar automáticamente. Selecciona y copia el texto.";
+      }
+    });
+  </script>
+</body>
+</html>
