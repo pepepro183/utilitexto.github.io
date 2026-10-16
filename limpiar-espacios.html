@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eliminador de espacios duplicados | UtiliTexto</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172554}
+header{background:#172554;color:white;text-align:center;padding:26px 16px}
+main{max-width:850px;margin:28px auto;padding:0 16px}
+.panel{background:white;border-radius:14px;padding:22px;box-shadow:0 4px 16px #0001}
+textarea{width:100%;min-height:220px;padding:14px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;resize:vertical}
+label{display:flex;gap:8px;align-items:center;margin:12px 0;color:#334155}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+button{border:0;border-radius:8px;padding:12px 15px;background:#1d4ed8;color:white;cursor:pointer;font-size:14px}
+button:hover{background:#1e40af}
+.secondary{background:#475569}
+#status{color:#166534;min-height:1.2em}
+footer{text-align:center;padding:24px;color:#475569}
+</style>
+</head>
+<body>
+<header>
+<h1>Eliminador de espacios duplicados</h1>
+<p>Limpia tus textos fácilmente con UtiliTexto</p>
+</header>
+
+<main>
+<section class="panel">
+<h2>Pega tu texto</h2>
+<textarea id="texto" placeholder="Escribe o pega aquí tu texto..."></textarea>
+
+<label>
+<input type="checkbox" id="lineas" checked>
+Eliminar espacios al principio y al final de cada línea
+</label>
+
+<label>
+<input type="checkbox" id="vacias">
+Eliminar líneas vacías repetidas
+</label>
+
+<div class="buttons">
+<button onclick="limpiarTexto()">Limpiar espacios</button>
+<button class="secondary" onclick="copiar()">Copiar resultado</button>
+<button class="secondary" onclick="borrar()">Borrar</button>
+</div>
+
+<p id="status" role="status" aria-live="polite"></p>
+</section>
+</main>
+
+<footer>UtiliTexto — Tus textos, más fáciles.</footer>
+
+<script>
+const campo = document.getElementById('texto');
+const estado = document.getElementById('status');
+
+function limpiarTexto() {
+  let lineas = campo.value.split(/\r?\n/);
+
+  lineas = lineas.map(linea =>
+    linea.replace(/[ \t]+/g, ' ')
+  );
+
+  if (document.getElementById('lineas').checked) {
+    lineas = lineas.map(linea => linea.trim());
+  }
+
+  let resultado = lineas.join('\n');
+
+  if (document.getElementById('vacias').checked) {
+    resultado = resultado.replace(/\n(?:[ \t]*\n){2,}/g, '\n\n');
+  }
+
+  campo.value = resultado;
+  estado.textContent = 'Texto limpiado correctamente.';
+}
+
+async function copiar() {
+  try {
+    await navigator.clipboard.writeText(campo.value);
+    estado.textContent = 'Resultado copiado.';
+  } catch (error) {
+    campo.select();
+    const correcto = document.execCommand('copy');
+    estado.textContent = correcto
+      ? 'Resultado copiado.'
+      : 'Selecciona el texto y cópialo manualmente.';
+  }
+}
+
+function borrar() {
+  campo.value = '';
+  estado.textContent = 'Texto borrado.';
+  campo.focus();
+}
+</script>
+</body>
+</html>
