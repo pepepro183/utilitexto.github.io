@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ordena palabras y listas alfabéticamente gratis con UtiliTexto.">
+  <title>Ordenador alfabético gratis | UtiliTexto</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #172554;
+    }
+
+    header {
+      background: #172554;
+      color: white;
+      text-align: center;
+      padding: 28px 16px;
+    }
+
+    header h1 { margin-top: 0; }
+
+    main {
+      max-width: 850px;
+      margin: 28px auto;
+      padding: 0 16px;
+    }
+
+    .panel {
+      background: white;
+      padding: 22px;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px #0001;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 230px;
+      padding: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: inherit;
+      resize: vertical;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 13px 0;
+      color: #334155;
+    }
+
+    select {
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: inherit;
+      background: white;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      background: #1d4ed8;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    button:hover { background: #1e40af; }
+    .secondary { background: #475569; }
+    .secondary:hover { background: #334155; }
+
+    #status {
+      min-height: 1.2em;
+      color: #166534;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Ordenador alfabético</h1>
+  <p>Organiza tus listas de A a Z o de Z a A</p>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Introduce tu lista</h2>
+    <p>Escribe o pega una palabra o elemento por línea.</p>
+
+    <textarea id="texto" placeholder="Ejemplo:
+Manzana
+Plátano
+Naranja
+Fresa"></textarea>
+
+    <label for="orden">Orden:</label>
+    <select id="orden">
+      <option value="az">De A a Z</option>
+      <option value="za">De Z a A</option>
+    </select>
+
+    <label>
+      <input type="checkbox" id="ignorar" checked>
+      Ignorar mayúsculas y minúsculas al ordenar
+    </label>
+
+    <label>
+      <input type="checkbox" id="duplicados">
+      Eliminar líneas duplicadas
+    </label>
+
+    <div class="buttons">
+      <button type="button" onclick="ordenarLista()">Ordenar lista</button>
+      <button type="button" class="secondary" onclick="copiarResultado()">Copiar resultado</button>
+      <button type="button" class="secondary" onclick="borrarTexto()">Borrar</button>
+    </div>
+
+    <p id="status" role="status" aria-live="polite"></p>
+  </section>
+</main>
+
+<footer>
+  UtiliTexto — Tus textos, más fáciles.
+</footer>
+
+<script>
+function ordenarLista() {
+  const campo = document.getElementById('texto');
+  const ignorar = document.getElementById('ignorar').checked;
+  const quitarDuplicados = document.getElementById('duplicados').checked;
+  const orden = document.getElementById('orden').value;
+  const estado = document.getElementById('status');
+
+  let lineas = campo.value
+    .split(/\r?\n/)
+    .map(linea => linea.trim())
+    .filter(linea => linea.length > 0);
+
+  if (quitarDuplicados) {
+    const vistos = new Set();
+
+    lineas = lineas.filter(linea => {
+      const clave = ignorar ? linea.toLocaleLowerCase('es') : linea;
+      if (vistos.has(clave)) return false;
+      vistos.add(clave);
+      return true;
+    });
+  }
+
+  lineas.sort((a, b) => {
+    const resultado = ignorar
+      ? a.localeCompare(b, 'es', { sensitivity: 'base' })
+      : a.localeCompare(b, 'es', { sensitivity: 'variant' });
+
+    return orden === 'az' ? resultado : -resultado;
+  });
+
+  campo.value = lineas.join('\n');
+  estado.textContent = 'Lista ordenada correctamente.';
+}
+
+async function copiarResultado() {
+  const campo = document.getElementById('texto');
+  const estado = document.getElementById('status');
+
+  try {
+    await navigator.clipboard.writeText(campo.value);
+    estado.textContent = 'Resultado copiado.';
+  } catch (error) {
+    campo.select();
+    const correcto = document.execCommand('copy');
+    estado.textContent = correcto
+      ? 'Resultado copiado.'
+      : 'Selecciona el texto y cópialo manualmente.';
+  }
+}
+
+function borrarTexto() {
+  document.getElementById('texto').value = '';
+  document.getElementById('status').textContent = 'Texto borrado.';
+  document.getElementById('texto').focus();
+}
+</script>
+
+</body>
+</html>
