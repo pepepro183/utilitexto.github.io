@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Cuenta caracteres con y sin espacios gratis con UtiliTexto.">
+<title>Contador de caracteres sin espacios | UtiliTexto</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172554}
+header{background:#172554;color:white;text-align:center;padding:28px 16px}
+main{max-width:850px;margin:28px auto;padding:0 16px}
+.panel{background:white;padding:22px;border-radius:14px;box-shadow:0 4px 16px #0001}
+textarea{width:100%;min-height:220px;padding:14px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;resize:vertical}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.stat{background:#eff6ff;padding:16px;border-radius:10px;text-align:center}
+.number{font-size:25px;font-weight:bold;color:#1d4ed8}
+.caption{font-size:13px;color:#475569;margin-top:6px}
+button{border:0;border-radius:8px;padding:12px 16px;background:#1d4ed8;color:white;cursor:pointer;margin:14px 8px 0 0}
+button:hover{background:#1e40af}
+.secondary{background:#475569}
+#status{color:#166534;min-height:1.2em}
+footer{text-align:center;padding:24px;color:#475569}
+@media(max-width:520px){.stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>Contador de caracteres sin espacios</h1>
+<p>Cuenta caracteres, letras y espacios de tu texto</p>
+</header>
+<main>
+<section class="panel">
+<h2>Escribe o pega tu texto</h2>
+<textarea id="texto" placeholder="Escribe o pega aquí tu texto..."></textarea>
+<div class="stats" aria-live="polite">
+<div class="stat"><div class="number" id="total">0</div><div class="caption">Caracteres totales</div></div>
+<div class="stat"><div class="number" id="sin">0</div><div class="caption">Sin espacios en blanco</div></div>
+<div class="stat"><div class="number" id="palabras">0</div><div class="caption">Palabras</div></div>
+</div>
+<button type="button" onclick="copiar()">Copiar texto</button>
+<button type="button" class="secondary" onclick="borrar()">Borrar texto</button>
+<p id="status" role="status" aria-live="polite"></p>
+</section>
+</main>
+<footer>UtiliTexto — Tus textos, más fáciles.</footer>
+<script>
+const campo=document.getElementById('texto');
+function actualizar(){
+ const t=campo.value;
+ document.getElementById('total').textContent=Array.from(t).length;
+ document.getElementById('sin').textContent=Array.from(t.replace(/\s/g,'')).length;
+ document.getElementById('palabras').textContent=(t.trim().match(/\S+/g)||[]).length;
+}
+campo.addEventListener('input',actualizar);
+async function copiar(){
+ try{
+  await navigator.clipboard.writeText(campo.value);
+  document.getElementById('status').textContent='Texto copiado.';
+ }catch(e){
+  campo.select();
+  const ok=document.execCommand('copy');
+  document.getElementById('status').textContent=ok?'Texto copiado.':'Selecciona y copia el texto manualmente.';
+ }
+}
+function borrar(){
+ campo.value='';
+ actualizar();
+ document.getElementById('status').textContent='Texto borrado.';
+ campo.focus();
+}
+</script>
+</body>
+</html>
