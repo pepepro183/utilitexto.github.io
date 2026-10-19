@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Compara dos textos gratis y encuentra las líneas diferentes con UtiliTexto.">
+<title>Comparador de textos online | UtiliTexto</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172554}
+header{background:#172554;color:white;text-align:center;padding:28px 16px}
+main{max-width:1000px;margin:28px auto;padding:0 16px}
+.panel{background:white;padding:22px;border-radius:14px;box-shadow:0 4px 16px #0001}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+textarea{width:100%;min-height:220px;padding:14px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;resize:vertical}
+label{display:block;font-weight:bold;margin-bottom:8px}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+button{border:0;border-radius:8px;padding:12px 16px;background:#1d4ed8;color:white;font-size:14px;cursor:pointer}
+button:hover{background:#1e40af}
+.secondary{background:#475569}
+.secondary:hover{background:#334155}
+#resultado{margin-top:18px;overflow-wrap:anywhere}
+.fila{padding:10px;margin:6px 0;border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere}
+.igual{background:#f1f5f9}
+.distinta{background:#fee2e2;border-left:4px solid #dc2626}
+.añadida{background:#dcfce7;border-left:4px solid #16a34a}
+#status{min-height:1.2em;color:#166534}
+footer{text-align:center;padding:24px;color:#475569}
+@media(max-width:650px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>Comparador de textos</h1>
+<p>Compara dos versiones y encuentra las diferencias</p>
+</header>
+<main>
+<section class="panel">
+<h2>Introduce los textos que quieres comparar</h2>
+<div class="grid">
+<div>
+<label for="texto1">Texto 1</label>
+<textarea id="texto1" placeholder="Pega aquí la primera versión..."></textarea>
+</div>
+<div>
+<label for="texto2">Texto 2</label>
+<textarea id="texto2" placeholder="Pega aquí la segunda versión..."></textarea>
+</div>
+</div>
+<div class="buttons">
+<button type="button" onclick="comparar()">Comparar textos</button>
+<button type="button" class="secondary" onclick="copiarInforme()">Copiar informe</button>
+<button type="button" class="secondary" onclick="borrar()">Borrar</button>
+</div>
+<p id="status" role="status" aria-live="polite"></p>
+<div id="resultado" aria-live="polite"></div>
+</section>
+</main>
+<footer>UtiliTexto — Tus textos, más fáciles.</footer>
+
+<script>
+let informe='';
+
+function comparar(){
+  const a=document.getElementById('texto1').value.split(/\r?\n/);
+  const b=document.getElementById('texto2').value.split(/\r?\n/);
+  const salida=document.getElementById('resultado');
+  const estado=document.getElementById('status');
+  salida.replaceChildren();
+  const max=Math.max(a.length,b.length);
+  let diferencias=0;
+  const lineasInforme=[];
+
+  for(let i=0;i<max;i++){
+    const existeA=i<a.length;
+    const existeB=i<b.length;
+    const igual=existeA&&existeB&&a[i]===b[i];
+    const fila=document.createElement('div');
+    fila.className='fila';
+
+    if(igual){
+      fila.classList.add('igual');
+      fila.textContent='Línea '+(i+1)+' · Sin cambios: '+a[i];
+      lineasInforme.push('Línea '+(i+1)+' · Sin cambios: '+a[i]);
+    }else{
+      diferencias++;
+      fila.classList.add(existeA&&existeB?'distinta':'añadida');
+      let detalle='Línea '+(i+1)+' · ';
+      detalle+=existeA?'Texto 1: '+a[i]:'Texto 1: (sin línea)';
+      detalle+=' | ';
+      detalle+=existeB?'Texto 2: '+b[i]:'Texto 2: (sin línea)';
+      fila.textContent=detalle;
+      lineasInforme.push(detalle);
+    }
+
+    salida.appendChild(fila);
+  }
+
+  informe='Informe de comparación\n\n'+lineasInforme.join('\n');
+  estado.textContent=diferencias===0
+    ? 'Los textos son iguales línea por línea.'
+    : 'Se han encontrado '+diferencias+' líneas diferentes o ausentes.';
+}
+
+async function copiarInforme(){
+  const estado=document.getElementById('status');
+  if(!informe){
+    estado.textContent='Primero compara los textos.';
+    return;
+  }
+  try{
+    await navigator.clipboard.writeText(informe);
+    estado.textContent='Informe copiado.';
+  }catch(error){
+    const area=document.createElement('textarea');
+    area.value=informe;
+    document.body.appendChild(area);
+    area.select();
+    const ok=document.execCommand('copy');
+    area.remove();
+    estado.textContent=ok?'Informe copiado.':'No se pudo copiar. Selecciona el informe manualmente.';
+  }
+}
+
+function borrar(){
+  document.getElementById('texto1').value='';
+  document.getElementById('texto2').value='';
+  document.getElementById('resultado').replaceChildren();
+  document.getElementById('status').textContent='Campos borrados.';
+  informe='';
+}
+</script>
+</body>
+</html>
