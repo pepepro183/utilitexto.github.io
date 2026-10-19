@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Elimina líneas duplicadas de tus listas gratis con UtiliTexto.">
+<title>Eliminar líneas duplicadas | UtiliTexto</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172554}
+header{background:#172554;color:white;text-align:center;padding:28px 16px}
+main{max-width:850px;margin:28px auto;padding:0 16px}
+.panel{background:white;padding:22px;border-radius:14px;box-shadow:0 4px 16px #0001}
+textarea{width:100%;min-height:230px;padding:14px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;resize:vertical}
+label{display:flex;align-items:center;gap:8px;margin:14px 0;color:#334155}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+button{border:0;border-radius:8px;padding:12px 16px;background:#1d4ed8;color:white;font-size:14px;cursor:pointer}
+button:hover{background:#1e40af}
+.secondary{background:#475569}
+.secondary:hover{background:#334155}
+#status{min-height:1.2em;color:#166534}
+footer{text-align:center;padding:24px;color:#475569}
+</style>
+</head>
+<body>
+<header>
+<h1>Eliminar líneas duplicadas</h1>
+<p>Limpia tus listas y elimina elementos repetidos</p>
+</header>
+<main>
+<section class="panel">
+<h2>Introduce tu lista</h2>
+<p>Escribe o pega un elemento por línea.</p>
+<textarea id="texto" placeholder="Ejemplo:
+Manzana
+Plátano
+Manzana
+Naranja"></textarea>
+
+<label>
+<input type="checkbox" id="ignorar" checked>
+Ignorar mayúsculas y minúsculas al detectar duplicados
+</label>
+
+<label>
+<input type="checkbox" id="vacias">
+Eliminar también las líneas vacías
+</label>
+
+<div class="buttons">
+<button type="button" onclick="eliminarDuplicados()">Eliminar duplicados</button>
+<button type="button" class="secondary" onclick="copiarTexto()">Copiar resultado</button>
+<button type="button" class="secondary" onclick="borrarTexto()">Borrar</button>
+</div>
+<p id="status" role="status" aria-live="polite"></p>
+</section>
+</main>
+<footer>UtiliTexto — Tus textos, más fáciles.</footer>
+
+<script>
+function eliminarDuplicados(){
+  const campo = document.getElementById('texto');
+  const ignorar = document.getElementById('ignorar').checked;
+  const quitarVacias = document.getElementById('vacias').checked;
+  const estado = document.getElementById('status');
+
+  const lineas = campo.value.split(/\r?\n/);
+  const resultado = [];
+  const vistos = new Set();
+  let repetidas = 0;
+
+  for(const linea of lineas){
+    if(linea.trim() === '' && quitarVacias){
+      continue;
+    }
+
+    const clave = ignorar
+      ? linea.trim().toLocaleLowerCase('es')
+      : linea.trim();
+
+    if(clave !== '' && vistos.has(clave)){
+      repetidas++;
+      continue;
+    }
+
+    if(clave !== ''){
+      vistos.add(clave);
+    }
+
+    resultado.push(linea);
+  }
+
+  campo.value = resultado.join('\n');
+  estado.textContent = repetidas === 0
+    ? 'No se encontraron líneas duplicadas.'
+    : 'Líneas duplicadas eliminadas: ' + repetidas + '.';
+}
+
+async function copiarTexto(){
+  const campo = document.getElementById('texto');
+  const estado = document.getElementById('status');
+
+  try{
+    await navigator.clipboard.writeText(campo.value);
+    estado.textContent = 'Resultado copiado.';
+  }catch(error){
+    campo.select();
+    const correcto = document.execCommand('copy');
+    estado.textContent = correcto
+      ? 'Resultado copiado.'
+      : 'Selecciona el texto y cópialo manualmente.';
+  }
+}
+
+function borrarTexto(){
+  document.getElementById('texto').value = '';
+  document.getElementById('status').textContent = 'Texto borrado.';
+  document.getElementById('texto').focus();
+}
+</script>
+</body>
+</html>
