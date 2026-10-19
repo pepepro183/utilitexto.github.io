@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Numera las líneas de tus textos online gratis con UtiliTexto.">
+<title>Numerar líneas online | UtiliTexto</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172554}
+header{background:#172554;color:white;text-align:center;padding:28px 16px}
+main{max-width:850px;margin:28px auto;padding:0 16px}
+.panel{background:white;padding:22px;border-radius:14px;box-shadow:0 4px 16px #0001}
+textarea{width:100%;min-height:220px;padding:14px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;resize:vertical}
+label{display:flex;gap:8px;align-items:center;margin:14px 0}
+input[type=number]{width:90px;padding:8px;border:1px solid #cbd5e1;border-radius:6px;font:inherit}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+button{border:0;border-radius:8px;padding:12px 16px;background:#1d4ed8;color:white;cursor:pointer}
+button:hover{background:#1e40af}
+.secondary{background:#475569}
+#status{color:#166534;min-height:1.2em}
+footer{text-align:center;padding:24px;color:#475569}
+</style>
+</head>
+<body>
+<header>
+<h1>Numerador de líneas</h1>
+<p>Añade números a tus listas y textos fácilmente</p>
+</header>
+<main>
+<section class="panel">
+<h2>Introduce tu texto</h2>
+<textarea id="texto" placeholder="Escribe o pega cada elemento en una línea..."></textarea>
+
+<label for="inicio">Empezar a numerar desde:</label>
+<input type="number" id="inicio" value="1" min="0" step="1">
+
+<label>
+<input type="checkbox" id="vacias" checked>
+Numerar también las líneas vacías
+</label>
+
+<div class="buttons">
+<button type="button" onclick="numerar()">Numerar líneas</button>
+<button type="button" class="secondary" onclick="copiar()">Copiar resultado</button>
+<button type="button" class="secondary" onclick="borrar()">Borrar</button>
+</div>
+<p id="status" role="status" aria-live="polite"></p>
+</section>
+</main>
+<footer>UtiliTexto — Tus textos, más fáciles.</footer>
+<script>
+function numerar(){
+ const campo=document.getElementById('texto');
+ const inicioInput=document.getElementById('inicio');
+ const estado=document.getElementById('status');
+ const inicio=Number(inicioInput.value);
+ if(!Number.isSafeInteger(inicio)||inicio<0){
+  estado.textContent='Introduce un número entero igual o mayor que cero.';
+  return;
+ }
+ const incluirVacias=document.getElementById('vacias').checked;
+ let numero=inicio;
+ campo.value=campo.value.split(/\r?\n/).map(linea=>{
+  if(!incluirVacias&&linea.trim()==='')return linea;
+  return (numero++)+'. '+linea;
+ }).join('\n');
+ estado.textContent='Líneas numeradas correctamente.';
+}
+async function copiar(){
+ const campo=document.getElementById('texto');
+ const estado=document.getElementById('status');
+ try{
+  await navigator.clipboard.writeText(campo.value);
+  estado.textContent='Resultado copiado.';
+ }catch(e){
+  campo.select();
+  const ok=document.execCommand('copy');
+  estado.textContent=ok?'Resultado copiado.':'Selecciona y copia el texto manualmente.';
+ }
+}
+function borrar(){
+ document.getElementById('texto').value='';
+ document.getElementById('status').textContent='Texto borrado.';
+ document.getElementById('texto').focus();
+}
+</script>
+</body>
+</html>
