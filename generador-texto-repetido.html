@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Repite palabras y frases online gratis con el generador de texto de UtiliTexto.">
+<title>Generador de texto repetido | UtiliTexto</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172554}
+header{background:#172554;color:white;text-align:center;padding:28px 16px}
+main{max-width:850px;margin:28px auto;padding:0 16px}
+.panel{background:white;padding:22px;border-radius:14px;box-shadow:0 4px 16px #0001}
+textarea{width:100%;min-height:170px;padding:14px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;resize:vertical}
+label{display:block;margin:16px 0 6px;font-weight:bold}
+input,select{padding:10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;max-width:100%}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+button{border:0;border-radius:8px;padding:12px 16px;background:#1d4ed8;color:white;cursor:pointer}
+button:hover{background:#1e40af}
+.secondary{background:#475569}
+#status{color:#166534;min-height:1.2em}
+footer{text-align:center;padding:24px;color:#475569}
+</style>
+</head>
+<body>
+<header>
+<h1>Generador de texto repetido</h1>
+<p>Repite palabras y frases en pocos segundos</p>
+</header>
+<main>
+<section class="panel">
+<h2>Configura tu texto</h2>
+<label for="texto">Texto que quieres repetir</label>
+<textarea id="texto" placeholder="Escribe una palabra o frase..."></textarea>
+
+<label for="cantidad">Número de repeticiones (1–1000)</label>
+<input type="number" id="cantidad" min="1" max="1000" value="5">
+
+<label for="separador">Separación entre repeticiones</label>
+<select id="separador">
+<option value="salto">Una por línea</option>
+<option value="espacio">Un espacio</option>
+<option value="coma">Coma y espacio</option>
+<option value="nada">Sin separación</option>
+</select>
+
+<div class="buttons">
+<button type="button" onclick="generar()">Generar texto</button>
+<button type="button" class="secondary" onclick="copiar()">Copiar resultado</button>
+<button type="button" class="secondary" onclick="borrar()">Borrar</button>
+</div>
+
+<label for="resultado">Resultado</label>
+<textarea id="resultado" readonly placeholder="El texto generado aparecerá aquí..."></textarea>
+<p id="status" role="status" aria-live="polite"></p>
+</section>
+</main>
+<footer>UtiliTexto — Tus textos, más fáciles.</footer>
+<script>
+function generar(){
+ const texto=document.getElementById('texto').value;
+ const cantidad=Number(document.getElementById('cantidad').value);
+ const separador=document.getElementById('separador').value;
+ const salida=document.getElementById('resultado');
+ const estado=document.getElementById('status');
+
+ if(!texto){
+  estado.textContent='Escribe el texto que quieres repetir.';
+  return;
+ }
+ if(!Number.isInteger(cantidad)||cantidad<1||cantidad>1000){
+  estado.textContent='Elige un número entero entre 1 y 1000.';
+  return;
+ }
+
+ const separaciones={
+  salto:'\n',
+  espacio:' ',
+  coma:', ',
+  nada:''
+ };
+ const separadorElegido=separaciones[separador];
+ const longitud=texto.length*cantidad+separadorElegido.length*(cantidad-1);
+
+ if(longitud>500000){
+  estado.textContent='El resultado sería demasiado largo. Reduce la cantidad o el texto.';
+  salida.value='';
+  return;
+ }
+
+ salida.value=Array(cantidad).fill(texto).join(separadorElegido);
+ estado.textContent='Texto generado: '+cantidad+' repeticiones.';
+}
+async function copiar(){
+ const salida=document.getElementById('resultado');
+ const estado=document.getElementById('status');
+ if(!salida.value){
+  estado.textContent='Primero genera el texto.';
+  return;
+ }
+ try{
+  await navigator.clipboard.writeText(salida.value);
+  estado.textContent='Resultado copiado.';
+ }catch(e){
+  salida.select();
+  const ok=document.execCommand('copy');
+  estado.textContent=ok?'Resultado copiado.':'Selecciona y copia el resultado manualmente.';
+ }
+}
+function borrar(){
+ document.getElementById('texto').value='';
+ document.getElementById('resultado').value='';
+ document.getElementById('cantidad').value=5;
+ document.getElementById('separador').value='salto';
+ document.getElementById('status').textContent='Campos borrados.';
+}
+</script>
+</body>
+</html>
