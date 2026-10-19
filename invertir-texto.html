@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Invierte textos y cambia el orden de las líneas gratis con UtiliTexto.">
+<title>Invertir texto online | UtiliTexto</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172554}
+header{background:#172554;color:white;text-align:center;padding:28px 16px}
+main{max-width:850px;margin:28px auto;padding:0 16px}
+.panel{background:white;padding:22px;border-radius:14px;box-shadow:0 4px 16px #0001}
+textarea{width:100%;min-height:220px;padding:14px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;resize:vertical}
+label{display:flex;align-items:center;gap:8px;margin:14px 0;color:#334155}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+button{border:0;border-radius:8px;padding:12px 16px;background:#1d4ed8;color:white;font-size:14px;cursor:pointer}
+button:hover{background:#1e40af}
+.secondary{background:#475569}
+.secondary:hover{background:#334155}
+#status{min-height:1.2em;color:#166534}
+footer{text-align:center;padding:24px;color:#475569}
+</style>
+</head>
+<body>
+<header>
+<h1>Invertir texto</h1>
+<p>Invierte caracteres o cambia el orden de tus líneas</p>
+</header>
+<main>
+<section class="panel">
+<h2>Introduce tu texto</h2>
+<textarea id="texto" placeholder="Escribe o pega aquí tu texto..."></textarea>
+
+<label for="modo">¿Qué quieres invertir?</label>
+<select id="modo" style="padding:10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit">
+<option value="caracteres">El orden de los caracteres</option>
+<option value="lineas">El orden de las líneas</option>
+</select>
+
+<div class="buttons">
+<button type="button" onclick="invertir()">Invertir texto</button>
+<button type="button" class="secondary" onclick="copiar()">Copiar resultado</button>
+<button type="button" class="secondary" onclick="borrar()">Borrar</button>
+</div>
+<p id="status" role="status" aria-live="polite"></p>
+</section>
+</main>
+<footer>UtiliTexto — Tus textos, más fáciles.</footer>
+<script>
+function invertir(){
+  const campo=document.getElementById('texto');
+  const modo=document.getElementById('modo').value;
+
+  if(modo==='caracteres'){
+    campo.value=Array.from(campo.value).reverse().join('');
+  }else{
+    campo.value=campo.value.split(/\r?\n/).reverse().join('\n');
+  }
+
+  document.getElementById('status').textContent='Texto invertido correctamente.';
+}
+async function copiar(){
+  const campo=document.getElementById('texto');
+  const estado=document.getElementById('status');
+  try{
+    await navigator.clipboard.writeText(campo.value);
+    estado.textContent='Resultado copiado.';
+  }catch(error){
+    campo.select();
+    const ok=document.execCommand('copy');
+    estado.textContent=ok?'Resultado copiado.':'Selecciona el texto y cópialo manualmente.';
+  }
+}
+function borrar(){
+  document.getElementById('texto').value='';
+  document.getElementById('status').textContent='Texto borrado.';
+  document.getElementById('texto').focus();
+}
+</script>
+</body>
+</html>
